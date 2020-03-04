@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JsonCryption.Utf8Json\Utf8Json.FLE.csproj" />
+    <ProjectReference Include="..\Utf8Json.FLE\Utf8Json.FLE.csproj" />
   </ItemGroup>
 
 </Project>
