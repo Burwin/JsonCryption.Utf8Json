@@ -1,165 +1,174 @@
-# JsonCryption
-## Field-level Encryption during JSON Serialization
-JsonCryption offers field-level encryption when serializing from .NET objects to JSON, using `Microsoft.AspNetCore.DataProtection` for encryption, key/algo management, etc.
+# Utf8Json.FLE
+## Field Level Encryption (FLE) plugin for Utf8Json
+Utf8Json.FLE offers Field Level Encryption (FLE) when serializing/deserializing between .NET objects and JSON.
 
 ### Installation
-Install the NuGet package for your JSON serializer:
 
-https://www.nuget.org/packages/JsonCryption.Utf8Json/
 ```
 // Package Manager
-Install-Package JsonCryption.Utf8Json
+Install-Package Utf8Json.FLE
 
 // .NET CLI
-dotnet add package JsonCryption.Utf8Json
-```
-
-https://www.nuget.org/packages/JsonCryption.Newtonsoft/
-```
-// Package Manager
-Install-Package JsonCryption.Newtonsoft
-
-// .NET CLI
-dotnet add package JsonCryption.Newtonsoft
-```
-
-https://www.nuget.org/packages/JsonCryption.System.Text.Json/
-```
-// Package Manager
-Install-Package JsonCryption.System.Text.Json
-
-// .NET CLI
-dotnet add package JsonCryption.System.Text.Json
+dotnet add package Utf8Json.FLE
 ```
 
 ### Motivation
-Integrating encryption/decryption of specified fields/properties of C# objects at the moment of JSON serialization/deserialization should be:
+Field Level Encryption of C# objects during JSON serialization/deserialization should be:
 - Relatively easy to use
 - Powered by industry-standard cryptography best-practices
 
-JsonCryption seeks to keep initial configuration to a minimum, and only requires decorating fields and properties to be protected with a simple attribute (in most cases):
+#### Relatively Easy to Use
+With default configuration, encrypting a field/property just requires decorating it with `EncryptAttribute`, and serializing the object as usual:
 ```
+// decorate properties to be encrypted
 class Foo
 {
     [Encrypt]
     public string MySecret { get; set; }
 }
+
+// serialize as normal
+Foo foo = new Foo() { ... };
+JsonSerializer.Serialize(foo);
 ```
 
-### Supported Serialization Libraries
-JsonCryption supports the following libraries:
-- Utf8Json (preferred)
-- Newtonsoft.Json
-- System.Text.Json
+More details on usage scenarios can be found below.
+
+#### Industry-standard Cryptography
+Currently, Utf8Json.FLE is built on top of the `Microsoft.AspNetCore.DataProtection` library for handling encryption-related responsibilities:
+- Encryption/decryption
+- Key management
+- Algorithm management
+- etc.
+
+Internally, we only depend on the single interface `IDataProtector`. If you don't want to use Microsoft's implementations, you could just depend on `Microsoft.AspNetCore.DataProtection.Abstractions` and provide an alternative implementation of `IDataProtector` when configuring Utf8Json.FLE.
+
+In the future, I would like to build some more customization around this to enable advanced scenarios of building different instances of `IDataProtector`. One use case for this functionality would be creating a segregated `IDataProtector` per user, potentially making it easy to support GDPR's "right to forget" user data.
 
 ### Supported Types
-JsonCryption should support any type serializable by the JSON serializer library used. If you spot a missing type, please let me know (or better yet, create a PR!).
+Utf8Json.FLE should support any type serializable by Utf8Json. If you spot a missing type or find odd behavior, please let me know (or better yet, create a PR!).
 
 ### Getting Started
 #### Configuration
 ##### Step 1: Configure Microsoft.AspNetCore.DataProtection
-JsonCryption depends on the `Microsoft.AspNetCore.DataProtection` library. Therefore, you should first ensure that your DataProtection layer is [configured properly](https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/).
+Utf8Json.FLE depends on the `Microsoft.AspNetCore.DataProtection` library. Therefore, you should first ensure that your DataProtection layer is [configured properly](https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/).
 
-Next, configuration depends on the JSON serializer used...
+##### Step 2: Configure Utf8Json
+Next, you'll need to set your default `IJsonFormatterResolver` to be an instance of `EncryptedResolver`, which should have a Singleton lifetime in your app.
 
-##### Step 2a: Configure Utf8Json
-To configure Utf8Json, you'll need to set your default `IJsonFormatterResolver` to be an instance of `EncryptedResolver`, which should have a Singleton lfietime in your app.
+`EncryptedResolver` takes two arguments:
+- An instance of `IJsonFormatterResolver`
+- An instance of `IDataProtector`
+
+The `IJsonFormatterResolver` serves two purposes. It is used to:
+- Serialize/deserialize when encryption isn't needed for a given field/property
+- Do unencrypted serialization/deserialization in the encrypted chain, prior to encrypting and after decrypting the resulting JSON string
+
+The `IDataProtector` is what encrypts your data. In a future release, we will likely treat this internally as an `IDataProtectionProvider` to create segregated `IDataProtector` instances per `IJsonFormatter<T>`. Since `IDataProtectionProvider` inherits from `IDataProtector`, this shouldn't cause breaking changes IN THE CODE. But it will likely cause issues decrypting already encrypted data. Since I don't want to write migration support, this library will be officially a `beta` until this is finished.
+
 ```
-// pseudo code
-var encryptedResolver = container.Resolve<EncryptedResolver>();
+var fallbackResolver = StandardResolver.AllowPrivate;
+var dataProtector = ...;
+var encryptedResolver = new EncryptedResolver(fallbackResolver, dataProtector);
 JsonSerializer.SetDefaultResolver(encryptedResolver);
 ```
 
-##### Step 2b: Configure Newtonsoft.Json
-The implementation for `Newtonsoft.Json` relies on Dependency Injection. To configure JsonCryption, you'll need to register your default JsonSerializer:
-```
-// pseudo code
-container.Register<JsonSerializer>(() => new JsonSerializer()
-{
-    ContractResolver = new JsonCryptionContractResolver(container.Resolve<IDataProtectionProvider>())
-});
-```
-
-##### Step 2c: Configure System.Text.Json
-`System.Text.Json` uses the static `JsonSerializer` to perform serialization operations. At the moment, that significantly changes the steps required for initial configuration. Nonetheless, I'm still trying to keep it simple.
-
-The first thing to go is Dependency Injection, which is weird considering how modern the `System.Text.Json` package is. So instead, I'm using a Singleton `Coordinator` to manage configuration... and I feel dirty doing it. I have some ideas for cleaning this up, but if anybody wants to take a crack at cleaning this to use DI, feel free to contact me and/or submit a PR.
-
-```
-// somewhere in your startup
-// pseudo code
-Coordinator.Configure(options =>
-{
-    options.DataProtectionProvider = container.Resolve<IDataProtectionProvider>();
-    options.JsonSerializerOptions = ...
-});
-```
-
 #### Usage
-Once configured, using JsonCryption is just a matter of decorating the properties/fields you wish to encrypt and the `EncryptAttribute` and serializing your C# objects as you normally would:
+Once configured, using Utf8Json.FLE is just a matter of decorating the properties/fields you wish to encrypt with the `EncryptAttribute` and serializing your C# objects as you normally would:
 ```
-var myFoo = new Foo("some important value", "something very public");
+var myFoo = new Foo("If the Foo shits, wear it.", "Utf8Json.FLE");
 
 class Foo
 {
     [Encrypt]
-    public string EncryptedString { get; }
+    public string LaunchCodes { get; }
   
-    public string UnencryptedString { get; }
+    public string FavoriteNugetPackage { get; }
+	
+	public Foo(string launchCodes, string favoriteNugetPackage)
+	{
+		LaunchCodes = launchCodes;
+		FavoriteNugetPackage = favoriteNugetPackage;
+	}
 }
 
-// Utf8Json
+// serializing
 var bytes = JsonSerializer.Serialize(myFoo);
 var json = Encoding.Utf8.GetString(bytes);
 
-// Newtonsoft.Json
-var serializer = ...
-
-using var textWriter = ...
-serializer.Serialize(textWriter, myFoo);
-
-// System.Text.Json
-JsonSerializer.Serialize(myFoo);
+// deserializing
+var fromBytes = JsonSerializer.Deserialize<Foo>(bytes);
+var fromJson = JsonSerializer.Deserialize<Foo>(json);
 ```
 
 ### Special Stuff
-The feature set is significantly different between the different JSON serializers due to differences in their customizable APIs. As of this writing, `Utf8Json` and `Newtonsoft.Json` generally offer a much wider array of features than `System.Text.Json`. `Utf8Json` is also blazing fast, which is why it's preferred.
+As much as possible, I'm trying to keep annotations usage as close to parity with Utf8Json as possible. Here's a current sampling:
 
-#### Fields
-Currently, only `Utf8Json` and `Newtonsoft.Json` support serializing and encrypting fields:
+#### Constructors
+Utf8Json.FLE resolves the constructor used during deserialization in a couple steps. It shouldn't matter whether or not the constructor is public or private. See the tests for details.
+1. If a constructor is decorated with `SerializationConstructorAttribute`, it's the constructor that will be used
 ```
-class FieldFoo
+class Foo
 {
-    [Encrypt]
-    public string MyPublicValue;
+	[Encrypt]
+	public int MyInt { get; }
+	
+	// This constructor will be used
+	[SerializationConstructor]
+	private Foo() { }
+	
+	public Foo(int myInt) { ... }
 }
 ```
+2. Otherwise, we try to find the constructor with the most parameter matches (by name, case-insensitive)
+```
+class Foo
+{
+	[Encrypt]
+	public int MyInt { get; }
+	
+	[Encrypt]
+	public string MyString { get; }
+	
+	public Foo() { }
+	public Foo(int myInt) { ... }
+	
+	// This constructor will be used
+	public Foo(int myInt, string myString) { ... }
+}
+```
+3. Otherwise, we use the default constructor
+
+After the object is rehydrated via the resolved constructor, individual serialized fields and properties not covered by the constructor will still be set.
 
 #### Non-public Properties and Fields
-Again, only `Utf8Json` and `Newtonsoft.Json` support this currently.
+Set the `fallbackResolver` of the `EncryptedResolver` to any `IJsonFormatterResolver` with `AllowPrivate` set to true. Then it should just work.
 
-For `Newtonsoft.Json`, the easiest way to do this is to decorate the field/property with an additional `JsonPropertyAttribute`:
+#### Custom JSON Serialized Property Names
+To customize the name used for the field/property in the resulting JSON, decorate the field/property with `DataMemberAttribute` and provide a `Name`:
 ```
-class NonPublicFoo
+class Foo
 {
-    [Encrypt]
-    [JsonProperty]
-    internal string InternalProperty { get; set; }
-  
-    [Encrypt]
-    [JsonProperty]
-    protected bool ProtectedField;
-  
-    [Encrypt]
-    [JsonProperty]
-    private Guid PrivateProperty { get; set; }
+	[Encrypt]
+	[DataMember(Name = "launchCode")]
+	public int MyInt { get; }
 }
 ```
 
-For `Utf8Json`, set the `fallbackResolver` of the `EncryptedResolver` to any `IJsonFormatterResolver` with `AllowPrivate` set to true.
+#### Ignored Fields/Properties
+To ignore a given field/property, decorate it with `IgnoreDataMemberAttribute`:
+```
+class Foo
+{
+	[IgnoreDataMember]
+	public int MyInt { get; }
+}
+```
 
 ### Future Plans
-JsonCryption is open to PRs and more regular contributors. Feel free to reach out if you're interested in helping.
+Utf8Json.FLE is open to PRs...
 
-Next, I'm hoping to do some benchmarking...
-
+Future projects/enhancements:
+- Benchmarking
+- Segregated `IDataProtector` instances per `IJsonFormatter<T>` by default
+- Provide interface to create `IDataProtector` instances by any custom logic
