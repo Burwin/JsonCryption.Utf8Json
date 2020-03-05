@@ -351,3 +351,4 @@ MigrationBackup/
 .ionide/
 *.ncrunchsolution
 *.orig
+/src/Utf8Json.FLE/Utf8Json.FLE.xml
