@@ -41,9 +41,7 @@ Currently, Utf8Json.FLE is built on top of the `Microsoft.AspNetCore.DataProtect
 - Algorithm management
 - etc.
 
-Internally, we only depend on the single interface `IDataProtector`. If you don't want to use Microsoft's implementations, you could just depend on `Microsoft.AspNetCore.DataProtection.Abstractions` and provide an alternative implementation of `IDataProtector` when configuring Utf8Json.FLE.
-
-In the future, I would like to build some more customization around this to enable advanced scenarios of building different instances of `IDataProtector`. One use case for this functionality would be creating a segregated `IDataProtector` per user, potentially making it easy to support GDPR's "right to forget" user data.
+Internally, we only depend on the two interfaces `IDataProtector` and `IDataProtectionProvider`. If you don't want to use Microsoft's implementations, you could just depend on `Microsoft.AspNetCore.DataProtection.Abstractions` and provide alternative implementations of `IDataProtector` and `IDataProtectionProvider`. One use case for this functionality might be creating a segregated `IDataProtector` per user, potentially making it easy to support GDPR's "right to forget" user data.
 
 ### Supported Types
 Utf8Json.FLE should support any type serializable by Utf8Json. If you spot a missing type or find odd behavior, please let me know (or better yet, create a PR!).
@@ -64,12 +62,12 @@ The `IJsonFormatterResolver` serves two purposes. It is used to:
 - Serialize/deserialize when encryption isn't needed for a given field/property
 - Do unencrypted serialization/deserialization in the encrypted chain, prior to encrypting and after decrypting the resulting JSON string
 
-The `IDataProtector` is what encrypts your data. In a future release, we will likely treat this internally as an `IDataProtectionProvider` to create segregated `IDataProtector` instances per `IJsonFormatter<T>`. Since `IDataProtectionProvider` inherits from `IDataProtector`, this shouldn't cause breaking changes IN THE CODE. But it will likely cause issues decrypting already encrypted data. Since I don't want to write migration support, this library will be officially a `beta` until this is finished.
+The `IDataProtectionProvider` will provide an instance of `IDataProtector`, which is what encrypts your data.
 
 ```
 var fallbackResolver = StandardResolver.AllowPrivate;
-var dataProtector = ...;
-var encryptedResolver = new EncryptedResolver(fallbackResolver, dataProtector);
+var dataProtectorProvider = ...;
+var encryptedResolver = new EncryptedResolver(fallbackResolver, dataProtectorProvider);
 JsonSerializer.SetDefaultResolver(encryptedResolver);
 ```
 
@@ -170,5 +168,3 @@ Utf8Json.FLE is open to PRs...
 
 Future projects/enhancements:
 - Benchmarking
-- Segregated `IDataProtector` instances per `IJsonFormatter<T>` by default
-- Provide interface to create `IDataProtector` instances by any custom logic
