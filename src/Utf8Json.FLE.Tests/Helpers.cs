@@ -14,8 +14,7 @@ namespace Utf8Json.FLE.Tests
         public static IJsonFormatterResolver GetEncryptedResolver(IJsonFormatterResolver fallbackResolver)
         {
             var dataProtectionProvider = DataProtectionProvider.Create("test");
-            var dataProtectorFactory = new DefaultDataProtectorFactory(dataProtectionProvider);
-            return new EncryptedResolver(fallbackResolver, dataProtectorFactory);
+            return new EncryptedResolver(fallbackResolver, dataProtectionProvider);
         }
     }
 }

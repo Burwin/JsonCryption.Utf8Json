@@ -10,7 +10,7 @@ namespace Utf8Json.FLE
 {
     internal sealed class EncryptedFormatter<T> : IJsonFormatter<T>
     {
-        private readonly IDataProtectorFactory _dataProtectorFactory;
+        private readonly IDataProtectionProvider _dataProtectorProvider;
         private readonly IJsonFormatterResolver _fallbackResolver;
         private readonly Dictionary<string, ExtendedMemberInfo> _memberInfos;
         private readonly ExtendedMemberInfo[] _constructorNonInitializedMembers;
@@ -18,9 +18,9 @@ namespace Utf8Json.FLE
 
         private static readonly Type CachedType = typeof(T);
 
-        internal EncryptedFormatter(IDataProtectorFactory dataProtectorFactory, IJsonFormatterResolver fallbackResolver, ExtendedMemberInfo[] extendedMemberInfos)
+        internal EncryptedFormatter(IDataProtectionProvider dataProtectionProvider, IJsonFormatterResolver fallbackResolver, ExtendedMemberInfo[] extendedMemberInfos)
         {
-            _dataProtectorFactory = dataProtectorFactory;
+            _dataProtectorProvider = dataProtectionProvider;
             _fallbackResolver = fallbackResolver;
 
             _memberInfos = extendedMemberInfos
@@ -55,7 +55,7 @@ namespace Utf8Json.FLE
 
                 var memberInfo = _memberInfos[propName];
                 var memberValue = memberInfo.ShouldEncrypt
-                    ? ReadEncrypted(ref reader, memberInfo, _dataProtectorFactory.Create(CachedType), _fallbackResolver)
+                    ? ReadEncrypted(ref reader, memberInfo, _dataProtectorProvider.CreateProtector(CachedType.FullName), _fallbackResolver)
                     : ReadNormal(ref reader, memberInfo, formatterResolver, _fallbackResolver);
                 values[memberInfo] = memberValue;
 
@@ -72,12 +72,12 @@ namespace Utf8Json.FLE
 
             if (_memberInfos.Any())
             {
-                WriteDataMember(ref writer, value, _memberInfos.First().Value, formatterResolver, _fallbackResolver, _dataProtectorFactory.Create(CachedType));
+                WriteDataMember(ref writer, value, _memberInfos.First().Value, formatterResolver, _fallbackResolver, _dataProtectorProvider.CreateProtector(CachedType.FullName));
             }
             foreach (var memberInfo in _memberInfos.Skip(1))
             {
                 writer.WriteValueSeparator();
-                WriteDataMember(ref writer, value, memberInfo.Value, formatterResolver, _fallbackResolver, _dataProtectorFactory.Create(CachedType));
+                WriteDataMember(ref writer, value, memberInfo.Value, formatterResolver, _fallbackResolver, _dataProtectorProvider.CreateProtector(CachedType.FullName));
             }
 
             writer.WriteEndObject();
