@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
-using Utf8Json;
-using Utf8Json.Resolvers;
 
 namespace Utf8Json.FLE.Tests
 {
@@ -12,12 +10,12 @@ namespace Utf8Json.FLE.Tests
             return $"\"{name}\":{serialized}";
         }
 
-        public static void SetJsonSerializerResolver(IJsonFormatterResolver fallbackResolver = null)
-            => JsonSerializer.SetDefaultResolver(
-                new EncryptedResolver(fallbackResolver ?? StandardResolver.AllowPrivate,
-                DataProtectionProvider.Create("test").CreateProtector("test")));
 
         public static IJsonFormatterResolver GetEncryptedResolver(IJsonFormatterResolver fallbackResolver)
-            => new EncryptedResolver(fallbackResolver, DataProtectionProvider.Create("test").CreateProtector("test"));
+        {
+            var dataProtectionProvider = DataProtectionProvider.Create("test");
+            var dataProtectorFactory = new DefaultDataProtectorFactory(dataProtectionProvider);
+            return new EncryptedResolver(fallbackResolver, dataProtectorFactory);
+        }
     }
 }

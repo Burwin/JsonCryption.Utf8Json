@@ -29,7 +29,7 @@ namespace Utf8Json.FLE
     public sealed class EncryptedResolver : IJsonFormatterResolver
     {
         private readonly IJsonFormatterResolver _fallbackResolver;
-        private readonly IDataProtector _dataProtector;
+        private readonly IDataProtectorFactory _dataProtectorFactory;
         private readonly ConcurrentDictionary<Type, IJsonFormatter> _formatterCache = new ConcurrentDictionary<Type, IJsonFormatter>();
 
         /// <summary>
@@ -37,11 +37,11 @@ namespace Utf8Json.FLE
         /// and an <see cref="IDataProtector"/>
         /// </summary>
         /// <param name="fallbackResolver">Used to serialize properties that do not need encryption</param>
-        /// <param name="dataProtector"></param>
-        public EncryptedResolver(IJsonFormatterResolver fallbackResolver, IDataProtector dataProtector)
+        /// <param name="dataProtectorFactory"></param>
+        public EncryptedResolver(IJsonFormatterResolver fallbackResolver, IDataProtectorFactory dataProtectorFactory)
         {
             _fallbackResolver = fallbackResolver;
-            _dataProtector = dataProtector;
+            _dataProtectorFactory = dataProtectorFactory;
         }
         
         /// <summary>
@@ -55,6 +55,6 @@ namespace Utf8Json.FLE
             return formatter;
         }
 
-        private IJsonFormatter<T> CreateFormatter<T>() => new EncryptedFormatter<T>(_dataProtector, _fallbackResolver, ExtendedMemberInfo.GetFrom(typeof(T), _fallbackResolver).ToArray());
+        private IJsonFormatter<T> CreateFormatter<T>() => new EncryptedFormatter<T>(_dataProtectorFactory, _fallbackResolver, ExtendedMemberInfo.GetFrom(typeof(T), _fallbackResolver).ToArray());
     }
 }
