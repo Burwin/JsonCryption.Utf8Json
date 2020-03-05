@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Utf8Json;
 
-namespace JsonCryption.Utf8Json
+namespace Utf8Json.FLE
 {
     internal sealed class ExtendedMemberInfo
     {

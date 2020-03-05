@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Utf8Json;
 
-namespace JsonCryption.Utf8Json
+namespace Utf8Json.FLE
 {
     internal sealed class ConstructorResolver
     {

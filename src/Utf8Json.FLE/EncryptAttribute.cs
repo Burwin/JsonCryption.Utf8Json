@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JsonCryption.Utf8Json
+namespace Utf8Json.FLE
 {
     /// <summary>
     /// Decorate fields and properties to encrypt/decrypt when serializing/deserializing

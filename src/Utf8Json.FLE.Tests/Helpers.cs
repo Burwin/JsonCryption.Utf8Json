@@ -2,7 +2,7 @@
 using Utf8Json;
 using Utf8Json.Resolvers;
 
-namespace JsonCryption.Utf8Json.Tests
+namespace Utf8Json.FLE.Tests
 {
     class Helpers
     {

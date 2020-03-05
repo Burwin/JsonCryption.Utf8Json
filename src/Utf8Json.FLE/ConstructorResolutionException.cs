@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JsonCryption.Utf8Json
+namespace Utf8Json.FLE
 {
     /// <summary>
     /// Exception thrown when an expected constructor for a given type cannot be found

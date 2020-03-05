@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("JsonCryption.Utf8Json.Tests")]
+[assembly: InternalsVisibleTo("Utf8Json.FLE.Tests")]
