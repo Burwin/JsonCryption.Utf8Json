@@ -14,15 +14,15 @@ namespace JsonCryption.Utf8Json.Tests
         {
             var instance = new FooDefault(1.2) { MyInt = 75, MyString = "secret" };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyInt, StandardResolver.AllowPrivate, nameof(instance.MyInt)));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyString, StandardResolver.AllowPrivate, nameof(instance.MyString)));
 
-            var deserialized = JsonSerializer.Deserialize<FooDefault>(json);
+            var deserialized = JsonSerializer.Deserialize<FooDefault>(json, resolver);
 
             deserialized.MyInt.ShouldBe(instance.MyInt);
             deserialized.MyString.ShouldBe(instance.MyString);
@@ -53,15 +53,15 @@ namespace JsonCryption.Utf8Json.Tests
         {
             var instance = new FooClosest { MyInt = 75, MyString = "secret" };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyInt, StandardResolver.AllowPrivate, nameof(instance.MyInt)));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyString, StandardResolver.AllowPrivate, nameof(instance.MyString)));
 
-            var deserialized = JsonSerializer.Deserialize<FooClosest>(json);
+            var deserialized = JsonSerializer.Deserialize<FooClosest>(json, resolver);
 
             deserialized.MyInt.ShouldBe(instance.MyInt);
             deserialized.MyString.ShouldBe(instance.MyString);
@@ -103,16 +103,16 @@ namespace JsonCryption.Utf8Json.Tests
         public void Use_annotated_constructor_if_exists()
         {
             var instance = new FooAnnotated("something secret", 75);
-            
-            Helpers.SetJsonSerializerResolver();
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
+
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyInt, StandardResolver.AllowPrivate, nameof(instance.MyInt)));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyString, StandardResolver.AllowPrivate, nameof(instance.MyString)));
 
-            var deserialized = JsonSerializer.Deserialize<FooAnnotated>(json);
+            var deserialized = JsonSerializer.Deserialize<FooAnnotated>(json, resolver);
 
             // 2 * 75
             deserialized.MyInt.ShouldBe(150);

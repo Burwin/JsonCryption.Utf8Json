@@ -1,6 +1,7 @@
 using Shouldly;
 using System.Text;
 using Utf8Json;
+using Utf8Json.Resolvers;
 using Xunit;
 
 namespace JsonCryption.Utf8Json.Tests
@@ -12,15 +13,15 @@ namespace JsonCryption.Utf8Json.Tests
         {
             var instance = new FullyEncryptedFoo() { MyDecimal = 1.234m, MyInt = 75, MyString = "Unencrypted" };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
             json.ShouldNotContain(instance.MyString);
             json.ShouldNotContain("\"MyInt\":75");
             json.ShouldNotContain("\"MyDecimal\":1.234");
 
-            var deserialized = JsonSerializer.Deserialize<FullyEncryptedFoo>(json);
+            var deserialized = JsonSerializer.Deserialize<FullyEncryptedFoo>(json, resolver);
 
             deserialized.MyDecimal.ShouldBe(instance.MyDecimal);
             deserialized.MyInt.ShouldBe(instance.MyInt);
@@ -44,15 +45,15 @@ namespace JsonCryption.Utf8Json.Tests
         {
             var instance = new NonEncryptedFoo() { MyDecimal = 1.234m, MyInt = 75, MyString = "Unencrypted" };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
             json.ShouldContain(instance.MyString);
             json.ShouldContain("\"MyInt\":75");
             json.ShouldContain("\"MyDecimal\":1.234");
 
-            var deserialized = JsonSerializer.Deserialize<NonEncryptedFoo>(json);
+            var deserialized = JsonSerializer.Deserialize<NonEncryptedFoo>(json, resolver);
 
             deserialized.MyDecimal.ShouldBe(instance.MyDecimal);
             deserialized.MyInt.ShouldBe(instance.MyInt);
@@ -72,14 +73,14 @@ namespace JsonCryption.Utf8Json.Tests
         {
             var instance = new PartiallyEncryptedFoo() { MyInt = 75, MyString = "Unencrypted" };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
             json.ShouldNotContain(instance.MyString);
             json.ShouldContain("\"MyInt\":75");
 
-            var deserialized = JsonSerializer.Deserialize<PartiallyEncryptedFoo>(json);
+            var deserialized = JsonSerializer.Deserialize<PartiallyEncryptedFoo>(json, resolver);
 
             deserialized.MyInt.ShouldBe(instance.MyInt);
             deserialized.MyString.ShouldBe(instance.MyString);

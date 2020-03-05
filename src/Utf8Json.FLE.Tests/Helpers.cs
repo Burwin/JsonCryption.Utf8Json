@@ -16,5 +16,8 @@ namespace JsonCryption.Utf8Json.Tests
             => JsonSerializer.SetDefaultResolver(
                 new EncryptedResolver(fallbackResolver ?? StandardResolver.AllowPrivate,
                 DataProtectionProvider.Create("test").CreateProtector("test")));
+
+        public static IJsonFormatterResolver GetEncryptedResolver(IJsonFormatterResolver fallbackResolver)
+            => new EncryptedResolver(fallbackResolver, DataProtectionProvider.Create("test").CreateProtector("test"));
     }
 }

@@ -74,13 +74,13 @@ namespace JsonCryption.Utf8Json.Tests
                 MyTripleTuple = new Tuple<string, int, decimal>("key", 75, decimal.MaxValue)
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var fallbackResolver = StandardResolver.AllowPrivate;
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
-            var resolver = StandardResolver.AllowPrivate;
-            var allProperties = GetAllPropertyValues(instance, resolver);
+            var allProperties = GetAllPropertyValues(instance, fallbackResolver);
 
             // make sure everything is encrypted
             foreach (var kvp in allProperties)
@@ -92,12 +92,12 @@ namespace JsonCryption.Utf8Json.Tests
                     .First(m => m.Name == nameof(Helpers.SerializedValueOf))
                     .MakeGenericMethod(kvp.Value.PropertyType);
 
-                var serialized = (string)method.Invoke(this, new object[] { value, resolver, kvp.Key });
+                var serialized = (string)method.Invoke(this, new object[] { value, fallbackResolver, kvp.Key });
                 
                 json.ShouldNotContain(serialized);
             }
 
-            var deserialized = JsonSerializer.Deserialize<FooPrimitives>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPrimitives>(json, resolver);
 
             // check after deserialization
             var normalProperties = allProperties
@@ -274,9 +274,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyLazyBar = new Lazy<Bar>(new Bar { MyInt = 75, MyString = "something public" })
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyBarDictionary, StandardResolver.AllowPrivate, nameof(instance.MyBarDictionary)));
@@ -285,7 +285,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyListOfBars, StandardResolver.AllowPrivate, nameof(instance.MyListOfBars)));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyLazyBar, StandardResolver.AllowPrivate, nameof(instance.MyLazyBar)));
 
-            var deserialized = JsonSerializer.Deserialize<FooComplex<Bar>>(json);
+            var deserialized = JsonSerializer.Deserialize<FooComplex<Bar>>(json, resolver);
 
             deserialized.MyBarDictionary.ShouldBe(instance.MyBarDictionary);
             deserialized.MyBars.ShouldBe(instance.MyBars);

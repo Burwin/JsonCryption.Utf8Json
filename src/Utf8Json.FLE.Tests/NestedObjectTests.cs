@@ -20,9 +20,9 @@ namespace JsonCryption.Utf8Json.Tests
                 }
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldContain("MyFooZero");
@@ -30,7 +30,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyFooZero.MyInt, StandardResolver.AllowPrivate, "MyInt"));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyFooZero.MyString, StandardResolver.AllowPrivate, "MyString"));
 
-            var deserialized = JsonSerializer.Deserialize<FooOne>(json);
+            var deserialized = JsonSerializer.Deserialize<FooOne>(json, resolver);
 
             deserialized.MyFooZero.MyInt.ShouldBe(instance.MyFooZero.MyInt);
             deserialized.MyFooZero.MyString.ShouldBe(instance.MyFooZero.MyString);
@@ -65,9 +65,9 @@ namespace JsonCryption.Utf8Json.Tests
                 }
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldContain("MyFooOne");
@@ -76,7 +76,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyFooOne.MyFooZero.MyInt, StandardResolver.AllowPrivate, "MyInt"));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyFooOne.MyFooZero.MyString, StandardResolver.AllowPrivate, "MyString"));
 
-            var deserialized = JsonSerializer.Deserialize<FooTwo>(json);
+            var deserialized = JsonSerializer.Deserialize<FooTwo>(json, resolver);
 
             deserialized.MyFooOne.MyFooZero.MyInt.ShouldBe(instance.MyFooOne.MyFooZero.MyInt);
             deserialized.MyFooOne.MyFooZero.MyString.ShouldBe(instance.MyFooOne.MyFooZero.MyString);
@@ -105,9 +105,9 @@ namespace JsonCryption.Utf8Json.Tests
                 }
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldContain("MyFooTwo");
@@ -117,7 +117,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyFooTwo.MyFooOne.MyFooZero.MyInt, StandardResolver.AllowPrivate, "MyInt"));
             json.ShouldNotContain(Helpers.SerializedValueOf(instance.MyFooTwo.MyFooOne.MyFooZero.MyString, StandardResolver.AllowPrivate, "MyString"));
 
-            var deserialized = JsonSerializer.Deserialize<FooThree>(json);
+            var deserialized = JsonSerializer.Deserialize<FooThree>(json, resolver);
 
             deserialized.MyFooTwo.MyFooOne.MyFooZero.MyInt.ShouldBe(instance.MyFooTwo.MyFooOne.MyFooZero.MyInt);
             deserialized.MyFooTwo.MyFooOne.MyFooZero.MyString.ShouldBe(instance.MyFooTwo.MyFooOne.MyFooZero.MyString);

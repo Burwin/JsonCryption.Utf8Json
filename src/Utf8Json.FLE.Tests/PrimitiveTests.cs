@@ -35,9 +35,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyUShort = ushort.MaxValue
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.MyBool}");
@@ -62,7 +62,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.MyULong}");
             json.ShouldNotContain($"\"MyUShort\":{instance.MyUShort}");
 
-            var deserialized = JsonSerializer.Deserialize<FooPublic>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPublic>(json, resolver);
 
             deserialized.MyBool.ShouldBe(instance.MyBool);
             deserialized.MyByte.ShouldBe(instance.MyByte);
@@ -160,9 +160,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyUShort = ushort.MaxValue
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.MyBool}");
@@ -187,7 +187,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.MyULong}");
             json.ShouldNotContain($"\"MyUShort\":{instance.MyUShort}");
 
-            var deserialized = JsonSerializer.Deserialize<FooInternal>(json);
+            var deserialized = JsonSerializer.Deserialize<FooInternal>(json, resolver);
 
             deserialized.MyBool.ShouldBe(instance.MyBool);
             deserialized.MyByte.ShouldBe(instance.MyByte);
@@ -278,9 +278,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyUShort = ushort.MaxValue
             };
 
-            Helpers.SetJsonSerializerResolver(StandardResolver.Default);
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain(nameof(instance.MyBool));
@@ -303,7 +303,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain(nameof(instance.MyULong));
             json.ShouldNotContain(nameof(instance.MyUShort));
 
-            var deserialized = JsonSerializer.Deserialize<FooInternal>(json);
+            var deserialized = JsonSerializer.Deserialize<FooInternal>(json, resolver);
 
             deserialized.MyBool.ShouldBe(default);
             deserialized.MyByte.ShouldBe(default);
@@ -333,9 +333,9 @@ namespace JsonCryption.Utf8Json.Tests
                 DateTime.Parse("2020/02/24"), 1.234m, 5.678, Fruit.Banana, 9.1011f, Guid.NewGuid(), 75, long.MaxValue, sbyte.MaxValue, short.MaxValue, "something secret",
                 uint.MaxValue, ulong.MaxValue, ushort.MaxValue);
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.Bool()}");
@@ -360,7 +360,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.ULong()}");
             json.ShouldNotContain($"\"MyUShort\":{instance.UShort()}");
 
-            var deserialized = JsonSerializer.Deserialize<FooPrivate>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPrivate>(json, resolver);
 
             deserialized.Bool().ShouldBe(instance.Bool());
             deserialized.Byte().ShouldBe(instance.Byte());
@@ -390,9 +390,9 @@ namespace JsonCryption.Utf8Json.Tests
                 DateTime.Parse("2020/02/24"), 1.234m, 5.678, Fruit.Banana, 9.1011f, Guid.NewGuid(), 75, long.MaxValue, sbyte.MaxValue, short.MaxValue, "something secret",
                 uint.MaxValue, ulong.MaxValue, ushort.MaxValue);
 
-            Helpers.SetJsonSerializerResolver(StandardResolver.Default);
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain("MyBool");
@@ -415,7 +415,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain("MyULong");
             json.ShouldNotContain("MyUShort");
 
-            var deserialized = JsonSerializer.Deserialize<FooPrivate>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPrivate>(json, resolver);
 
             deserialized.Bool().ShouldBe(default);
             deserialized.Byte().ShouldBe(default);
@@ -548,9 +548,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyUShort = ushort.MaxValue
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.MyBool}");
@@ -575,7 +575,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.MyULong}");
             json.ShouldNotContain($"\"MyUShort\":{instance.MyUShort}");
 
-            var deserialized = JsonSerializer.Deserialize<FooPublicFields>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPublicFields>(json, resolver);
 
             deserialized.MyBool.ShouldBe(instance.MyBool);
             deserialized.MyByte.ShouldBe(instance.MyByte);
@@ -666,9 +666,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyUShort = ushort.MaxValue
             };
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.MyBool}");
@@ -693,7 +693,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.MyULong}");
             json.ShouldNotContain($"\"MyUShort\":{instance.MyUShort}");
 
-            var deserialized = JsonSerializer.Deserialize<FooInternalFields>(json);
+            var deserialized = JsonSerializer.Deserialize<FooInternalFields>(json, resolver);
 
             deserialized.MyBool.ShouldBe(instance.MyBool);
             deserialized.MyByte.ShouldBe(instance.MyByte);
@@ -742,9 +742,9 @@ namespace JsonCryption.Utf8Json.Tests
                 MyUShort = ushort.MaxValue
             };
 
-            Helpers.SetJsonSerializerResolver(StandardResolver.Default);
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain(nameof(instance.MyBool));
@@ -767,7 +767,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain(nameof(instance.MyULong));
             json.ShouldNotContain(nameof(instance.MyUShort));
 
-            var deserialized = JsonSerializer.Deserialize<FooInternalFields>(json);
+            var deserialized = JsonSerializer.Deserialize<FooInternalFields>(json, resolver);
 
             deserialized.MyBool.ShouldBe(default);
             deserialized.MyByte.ShouldBe(default);
@@ -839,9 +839,9 @@ namespace JsonCryption.Utf8Json.Tests
                 DateTime.Parse("2020/02/24"), 1.234m, 5.678, Fruit.Banana, 9.1011f, Guid.NewGuid(), 75, long.MaxValue, sbyte.MaxValue, short.MaxValue, "something secret",
                 uint.MaxValue, ulong.MaxValue, ushort.MaxValue);
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.Bool()}");
@@ -866,7 +866,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.ULong()}");
             json.ShouldNotContain($"\"MyUShort\":{instance.UShort()}");
 
-            var deserialized = JsonSerializer.Deserialize<FooPrivateFields>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPrivateFields>(json, resolver);
 
             deserialized.Bool().ShouldBe(instance.Bool());
             deserialized.Byte().ShouldBe(instance.Byte());
@@ -896,9 +896,9 @@ namespace JsonCryption.Utf8Json.Tests
                 DateTime.Parse("2020/02/24"), 1.234m, 5.678, Fruit.Banana, 9.1011f, Guid.NewGuid(), 75, long.MaxValue, sbyte.MaxValue, short.MaxValue, "something secret",
                 uint.MaxValue, ulong.MaxValue, ushort.MaxValue);
 
-            Helpers.SetJsonSerializerResolver(StandardResolver.Default);
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain("MyBool");
@@ -921,7 +921,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain("MyULong");
             json.ShouldNotContain("MyUShort");
 
-            var deserialized = JsonSerializer.Deserialize<FooPrivateFields>(json);
+            var deserialized = JsonSerializer.Deserialize<FooPrivateFields>(json, resolver);
 
             deserialized.Bool().ShouldBe(default);
             deserialized.Byte().ShouldBe(default);
@@ -1035,9 +1035,9 @@ namespace JsonCryption.Utf8Json.Tests
                 DateTime.Parse("2020/02/24"), 1.234m, 5.678, Fruit.Banana, 9.1011f, Guid.NewGuid(), 75, long.MaxValue, sbyte.MaxValue, short.MaxValue, "something secret",
                 uint.MaxValue, ulong.MaxValue, ushort.MaxValue);
 
-            Helpers.SetJsonSerializerResolver();
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.AllowPrivate);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.Bool()}");
@@ -1062,7 +1062,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.MyULong}");
             json.ShouldNotContain($"\"MyUShort\":{instance.MyUShort}");
 
-            var deserialized = JsonSerializer.Deserialize<FooMixed>(json);
+            var deserialized = JsonSerializer.Deserialize<FooMixed>(json, resolver);
 
             deserialized.Bool().ShouldBe(instance.Bool());
             deserialized.Byte().ShouldBe(instance.Byte());
@@ -1092,9 +1092,9 @@ namespace JsonCryption.Utf8Json.Tests
                 DateTime.Parse("2020/02/24"), 1.234m, 5.678, Fruit.Banana, 9.1011f, Guid.NewGuid(), 75, long.MaxValue, sbyte.MaxValue, short.MaxValue, "something secret",
                 uint.MaxValue, ulong.MaxValue, ushort.MaxValue);
 
-            Helpers.SetJsonSerializerResolver(StandardResolver.Default);
+            var resolver = Helpers.GetEncryptedResolver(StandardResolver.Default);
 
-            var bytes = JsonSerializer.Serialize(instance);
+            var bytes = JsonSerializer.Serialize(instance, resolver);
             var json = Encoding.UTF8.GetString(bytes);
 
             json.ShouldNotContain($"\"MyBool\":{instance.Bool()}");
@@ -1119,7 +1119,7 @@ namespace JsonCryption.Utf8Json.Tests
             json.ShouldNotContain($"\"MyULong\":{instance.MyULong}");
             json.ShouldNotContain($"\"MyUShort\":{instance.MyUShort}");
 
-            var deserialized = JsonSerializer.Deserialize<FooMixed>(json);
+            var deserialized = JsonSerializer.Deserialize<FooMixed>(json, resolver);
 
             deserialized.Bool().ShouldBe(default);
             deserialized.Byte().ShouldBe(default);

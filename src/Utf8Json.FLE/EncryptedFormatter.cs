@@ -57,7 +57,7 @@ namespace JsonCryption.Utf8Json
                 var memberInfo = _memberInfos[propName];
                 var memberValue = memberInfo.ShouldEncrypt
                     ? ReadEncrypted(ref reader, memberInfo, _dataProtector, _fallbackResolver)
-                    : ReadNormal(ref reader, memberInfo, _fallbackResolver);
+                    : ReadNormal(ref reader, memberInfo, formatterResolver, _fallbackResolver);
                 values[memberInfo] = memberValue;
 
                 if (!reader.ReadIsEndObject())
@@ -73,12 +73,12 @@ namespace JsonCryption.Utf8Json
 
             if (_memberInfos.Any())
             {
-                WriteDataMember(ref writer, value, _memberInfos.First().Value, _fallbackResolver, _dataProtector);
+                WriteDataMember(ref writer, value, _memberInfos.First().Value, formatterResolver, _fallbackResolver, _dataProtector);
             }
             foreach (var memberInfo in _memberInfos.Skip(1))
             {
                 writer.WriteValueSeparator();
-                WriteDataMember(ref writer, value, memberInfo.Value, _fallbackResolver, _dataProtector);
+                WriteDataMember(ref writer, value, memberInfo.Value, formatterResolver, _fallbackResolver, _dataProtector);
             }
 
             writer.WriteEndObject();
@@ -122,22 +122,22 @@ namespace JsonCryption.Utf8Json
             return deserialized;
         }
 
-        private static dynamic ReadNormal(ref JsonReader reader, ExtendedMemberInfo memberInfo, IJsonFormatterResolver fallbackResolver)
+        private static dynamic ReadNormal(ref JsonReader reader, ExtendedMemberInfo memberInfo, IJsonFormatterResolver formatterResolver, IJsonFormatterResolver fallbackResolver)
         {
             if (!memberInfo.HasNestedEncryptedMembers)
                 return JsonSerializer.Deserialize<dynamic>(ref reader, fallbackResolver);
 
             var localReader = new JsonReader(Encoding.UTF8.GetBytes(reader.ReadString()));
-            return memberInfo.TypedDeserializer(ref localReader, JsonSerializer.DefaultResolver);
+            return memberInfo.TypedDeserializer(ref localReader, formatterResolver);
         }
 
-        private static void WriteDataMember(ref JsonWriter writer, T value, ExtendedMemberInfo memberInfo, IJsonFormatterResolver fallbackResolver, IDataProtector dataProtector)
+        private static void WriteDataMember(ref JsonWriter writer, T value, ExtendedMemberInfo memberInfo, IJsonFormatterResolver formatterResolver, IJsonFormatterResolver fallbackResolver, IDataProtector dataProtector)
         {
             writer.WritePropertyName(memberInfo.Name);
             object memberValue = memberInfo.Getter(value);
             var valueToSerialize = memberInfo.ShouldEncrypt
                 ? BuildEncryptedValue(memberValue, memberInfo, fallbackResolver, dataProtector)
-                : BuildNormalValue(memberValue, memberInfo, memberInfo.HasNestedEncryptedMembers);
+                : BuildNormalValue(memberValue, memberInfo, memberInfo.HasNestedEncryptedMembers, formatterResolver);
             JsonSerializer.Serialize(ref writer, valueToSerialize, fallbackResolver);
         }
 
@@ -148,13 +148,13 @@ namespace JsonCryption.Utf8Json
             return dataProtector.Protect(localWriter.ToString());
         }
 
-        private static object BuildNormalValue(dynamic memberValue, ExtendedMemberInfo memberInfo, bool hasNestedEncryptedMembers)
+        private static object BuildNormalValue(dynamic memberValue, ExtendedMemberInfo memberInfo, bool hasNestedEncryptedMembers, IJsonFormatterResolver formatterResolver)
         {
             if (!hasNestedEncryptedMembers)
                 return memberValue;
 
             var localWriter = new JsonWriter();
-            memberInfo.FallbackSerializer(ref localWriter, memberValue, JsonSerializer.DefaultResolver);
+            memberInfo.FallbackSerializer(ref localWriter, memberValue, formatterResolver);
             return localWriter.ToString();
         }
     }
