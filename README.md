@@ -64,11 +64,19 @@ The `IJsonFormatterResolver` serves two purposes. It is used to:
 
 The `IDataProtectionProvider` will provide an instance of `IDataProtector`, which is what encrypts your data.
 
+###### Default Setup
 ```
 var fallbackResolver = StandardResolver.AllowPrivate;
 var dataProtectorProvider = ...;
 var encryptedResolver = new EncryptedResolver(fallbackResolver, dataProtectorProvider);
 JsonSerializer.SetDefaultResolver(encryptedResolver);
+```
+
+###### Per Usage Setup
+Alternatively, you can abstain from setting the default `IJsonFormatterResolver`, and instead explicitly pass an instance of `EncryptedResolver` whenever you want encryption functionality:
+```
+JsonSerializer.Serialize(foo, encryptedResolver);
+JsonSerializer.Deserialize<Foo>(json, encryptedResolver);
 ```
 
 #### Usage
