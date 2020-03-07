@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using Utf8Json;
 
-namespace Utf8Json.FLE
+namespace JsonCryption.Utf8Json
 {
     /// <summary>
     /// Set to <see cref="JsonSerializer"/>'s default resolver to get built-in field-level encryption

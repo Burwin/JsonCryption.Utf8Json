@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using Utf8Json;
 
-namespace Utf8Json.FLE.Tests
+namespace JsonCryption.Utf8Json.Tests
 {
     class Helpers
     {

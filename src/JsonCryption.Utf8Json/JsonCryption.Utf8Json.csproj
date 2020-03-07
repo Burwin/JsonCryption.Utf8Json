@@ -6,8 +6,8 @@
     <Authors>Michael Harris</Authors>
     <Description>Field Level Encryption (FLE) plugin for Utf8Json</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Burwin/Utf8Json.FLE</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Burwin/Utf8Json.FLE</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Burwin/JsonCryption.Utf8Json</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Burwin/JsonCryption.Utf8Json</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 

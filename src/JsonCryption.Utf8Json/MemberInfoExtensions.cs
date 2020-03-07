@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Utf8Json.FLE
+namespace JsonCryption.Utf8Json
 {
     internal static class MemberInfoExtensions
     {

@@ -1,6 +1,7 @@
-﻿using Utf8Json.Resolvers;
+﻿using Utf8Json;
+using Utf8Json.Resolvers;
 
-namespace Utf8Json.FLE
+namespace JsonCryption.Utf8Json
 {
     internal static class JsonFormatterResolverExtensions
     {

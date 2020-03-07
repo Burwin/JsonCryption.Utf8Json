@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Utf8Json.FLE.Tests
+namespace JsonCryption.Utf8Json.Tests
 {
     public class ImmutablesTests
     {

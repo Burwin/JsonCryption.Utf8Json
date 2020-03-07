@@ -1,9 +1,10 @@
 using Shouldly;
 using System.Text;
+using Utf8Json;
 using Utf8Json.Resolvers;
 using Xunit;
 
-namespace Utf8Json.FLE.Tests
+namespace JsonCryption.Utf8Json.Tests
 {
     public class SmokeTests
     {

@@ -4,18 +4,18 @@
         <name>JsonCryption.Utf8Json</name>
     </assembly>
     <members>
-        <member name="T:Utf8Json.FLE.ConstructorResolutionException">
+        <member name="T:JsonCryption.Utf8Json.ConstructorResolutionException">
             <summary>
             Exception thrown when an expected constructor for a given type cannot be found
             </summary>
         </member>
-        <member name="M:Utf8Json.FLE.ConstructorResolutionException.#ctor(System.Type)">
+        <member name="M:JsonCryption.Utf8Json.ConstructorResolutionException.#ctor(System.Type)">
             <summary>
             Create a new instance from the provided Type
             </summary>
             <param name="type">The Type for which an expected constructor cannot be found</param>
         </member>
-        <member name="T:Utf8Json.FLE.EncryptAttribute">
+        <member name="T:JsonCryption.Utf8Json.EncryptAttribute">
             <summary>
             Decorate fields and properties to encrypt/decrypt when serializing/deserializing
             
@@ -26,10 +26,10 @@
             }
             </summary>
         </member>
-        <member name="T:Utf8Json.FLE.EncryptedResolver">
+        <member name="T:JsonCryption.Utf8Json.EncryptedResolver">
             <summary>
             Set to <see cref="T:Utf8Json.JsonSerializer"/>'s default resolver to get built-in field-level encryption
-            of fields and properties marked with the <see cref="T:Utf8Json.FLE.EncryptAttribute"/>:
+            of fields and properties marked with the <see cref="T:JsonCryption.Utf8Json.EncryptAttribute"/>:
             
             // configure
             IDataProtectionProvider dataProtectionProvider = ...
@@ -49,15 +49,15 @@
             
             </summary>
         </member>
-        <member name="M:Utf8Json.FLE.EncryptedResolver.#ctor(Utf8Json.IJsonFormatterResolver,Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+        <member name="M:JsonCryption.Utf8Json.EncryptedResolver.#ctor(Utf8Json.IJsonFormatterResolver,Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
             <summary>
-            Creates a new <see cref="T:Utf8Json.FLE.EncryptedResolver"/> with a given fallback default <see cref="T:Utf8Json.IJsonFormatterResolver"/>
+            Creates a new <see cref="T:JsonCryption.Utf8Json.EncryptedResolver"/> with a given fallback default <see cref="T:Utf8Json.IJsonFormatterResolver"/>
             and an <see cref="T:Microsoft.AspNetCore.DataProtection.IDataProtector"/>
             </summary>
             <param name="fallbackResolver">Used to serialize properties that do not need encryption</param>
             <param name="dataProtectionProvider"></param>
         </member>
-        <member name="M:Utf8Json.FLE.EncryptedResolver.GetFormatter``1">
+        <member name="M:JsonCryption.Utf8Json.EncryptedResolver.GetFormatter``1">
             <summary>
             Resolves an encryption-ready <see cref="T:Utf8Json.IJsonFormatter`1"/>
             </summary>
