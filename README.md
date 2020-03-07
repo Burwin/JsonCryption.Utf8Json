@@ -2,6 +2,9 @@
 ## Field Level Encryption (FLE) plugin for Utf8Json
 JsonCryption.Utf8Json offers Field Level Encryption (FLE) when serializing/deserializing between .NET objects and JSON.
 
+![Build and Test](https://github.com/Burwin/JsonCryption.Uft8Json/workflows/Build%20and%20Test/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Burwin_JsonCryption.Uft8Json&metric=alert_status)](https://sonarcloud.io/dashboard?id=Burwin_JsonCryption.Uft8Json)
+
 ### Installation
 
 ```
