@@ -1,15 +1,15 @@
-# Utf8Json.FLE
+# JsonCryption.Utf8Json
 ## Field Level Encryption (FLE) plugin for Utf8Json
-Utf8Json.FLE offers Field Level Encryption (FLE) when serializing/deserializing between .NET objects and JSON.
+JsonCryption.Utf8Json offers Field Level Encryption (FLE) when serializing/deserializing between .NET objects and JSON.
 
 ### Installation
 
 ```
 // Package Manager
-Install-Package Utf8Json.FLE
+Install-Package JsonCryption.Utf8Json
 
 // .NET CLI
-dotnet add package Utf8Json.FLE
+dotnet add package JsonCryption.Utf8Json
 ```
 
 ### Motivation
@@ -35,7 +35,7 @@ JsonSerializer.Serialize(foo);
 More details on usage scenarios can be found below.
 
 #### Industry-standard Cryptography
-Currently, Utf8Json.FLE is built on top of the `Microsoft.AspNetCore.DataProtection` library for handling encryption-related responsibilities:
+Currently, JsonCryption.Utf8Json is built on top of the `Microsoft.AspNetCore.DataProtection` library for handling encryption-related responsibilities:
 - Encryption/decryption
 - Key management
 - Algorithm management
@@ -44,12 +44,12 @@ Currently, Utf8Json.FLE is built on top of the `Microsoft.AspNetCore.DataProtect
 Internally, we only depend on the two interfaces `IDataProtector` and `IDataProtectionProvider`. If you don't want to use Microsoft's implementations, you could just depend on `Microsoft.AspNetCore.DataProtection.Abstractions` and provide alternative implementations of `IDataProtector` and `IDataProtectionProvider`. One use case for this functionality might be creating a segregated `IDataProtector` per user, potentially making it easy to support GDPR's "right to forget" user data.
 
 ### Supported Types
-Utf8Json.FLE should support any type serializable by Utf8Json. If you spot a missing type or find odd behavior, please let me know (or better yet, create a PR!).
+JsonCryption.Utf8Json should support any type serializable by Utf8Json. If you spot a missing type or find odd behavior, please let me know (or better yet, create a PR!).
 
 ### Getting Started
 #### Configuration
 ##### Step 1: Configure Microsoft.AspNetCore.DataProtection
-Utf8Json.FLE depends on the `Microsoft.AspNetCore.DataProtection` library. Therefore, you should first ensure that your DataProtection layer is [configured properly](https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/).
+JsonCryption.Utf8Json depends on the `Microsoft.AspNetCore.DataProtection` library. Therefore, you should first ensure that your DataProtection layer is [configured properly](https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/).
 
 ##### Step 2: Configure Utf8Json
 Next, you'll need to set your default `IJsonFormatterResolver` to be an instance of `EncryptedResolver`, which should have a Singleton lifetime in your app.
@@ -80,9 +80,9 @@ JsonSerializer.Deserialize<Foo>(json, encryptedResolver);
 ```
 
 #### Usage
-Once configured, using Utf8Json.FLE is just a matter of decorating the properties/fields you wish to encrypt with the `EncryptAttribute` and serializing your C# objects as you normally would:
+Once configured, using JsonCryption.Utf8Json is just a matter of decorating the properties/fields you wish to encrypt with the `EncryptAttribute` and serializing your C# objects as you normally would:
 ```
-var myFoo = new Foo("If the Foo shits, wear it.", "Utf8Json.FLE");
+var myFoo = new Foo("If the Foo shits, wear it.", "JsonCryption.Utf8Json");
 
 class Foo
 {
@@ -111,7 +111,7 @@ var fromJson = JsonSerializer.Deserialize<Foo>(json);
 As much as possible, I'm trying to keep annotations usage as close to parity with Utf8Json as possible. Here's a current sampling:
 
 #### Constructors
-Utf8Json.FLE resolves the constructor used during deserialization in a couple steps. It shouldn't matter whether or not the constructor is public or private. See the tests for details.
+JsonCryption.Utf8Json resolves the constructor used during deserialization in a couple steps. It shouldn't matter whether or not the constructor is public or private. See the tests for details.
 1. If a constructor is decorated with `SerializationConstructorAttribute`, it's the constructor that will be used
 ```
 class Foo
@@ -172,7 +172,7 @@ class Foo
 ```
 
 ### Future Plans
-Utf8Json.FLE is open to PRs...
+JsonCryption.Utf8Json is open to PRs...
 
 Future projects/enhancements:
 - Benchmarking
