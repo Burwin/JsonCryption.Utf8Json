@@ -1,5 +1,4 @@
 # JsonCryption.Utf8Json
-## Field Level Encryption (FLE) plugin for Utf8Json
 JsonCryption.Utf8Json offers Field Level Encryption (FLE) when serializing/deserializing between .NET objects and JSON.
 
 ![Build and Test](https://github.com/Burwin/JsonCryption.Uft8Json/workflows/Build%20and%20Test/badge.svg)
@@ -58,8 +57,8 @@ JsonCryption.Utf8Json depends on the `Microsoft.AspNetCore.DataProtection` libra
 Next, you'll need to set your default `IJsonFormatterResolver` to be an instance of `EncryptedResolver`, which should have a Singleton lifetime in your app.
 
 `EncryptedResolver` takes two arguments:
-- An instance of `IJsonFormatterResolver`
-- An instance of `IDataProtector`
+- An instance of `Utf8Json.IJsonFormatterResolver`
+- An instance of `Microsoft.AspNetCore.DataProtection.Abstractions.IDataProtectionProvider`
 
 The `IJsonFormatterResolver` serves two purposes. It is used to:
 - Serialize/deserialize when encryption isn't needed for a given field/property
@@ -69,9 +68,9 @@ The `IDataProtectionProvider` will provide an instance of `IDataProtector`, whic
 
 ###### Default Setup
 ```
-var fallbackResolver = StandardResolver.AllowPrivate;
-var dataProtectorProvider = ...;
-var encryptedResolver = new EncryptedResolver(fallbackResolver, dataProtectorProvider);
+IJsonFormatterResolver fallbackResolver = StandardResolver.AllowPrivate;
+IDataProtectionProvider dataProtectionProvider = ...;
+IJsonFormatterResolver encryptedResolver = new EncryptedResolver(fallbackResolver, dataProtectionProvider);
 JsonSerializer.SetDefaultResolver(encryptedResolver);
 ```
 
